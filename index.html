@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Imago English – Live Demo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- Social / Link preview -->
+  <meta property="og:title" content="Imago English – EdTech Web App (Live Demo)">
+  <meta property="og:description" content="Modular Flask app with spaced-repetition flashcards, audiobook reader with inline translation, teacher/admin dashboards, Google Calendar & Google Login.">
+  <meta property="og:type" content="website">
+
+  <style>
+    :root {
+      --bg: #05060a;
+      --bg-alt: #111827;
+      --accent: #f97316;
+      --accent-soft: rgba(249, 115, 22, 0.12);
+      --text-main: #f9fafb;
+      --text-muted: #9ca3af;
+      --border-subtle: rgba(148, 163, 184, 0.35);
+      --card-radius: 18px;
+      --shadow-soft: 0 22px 45px rgba(15, 23, 42, 0.75);
+      --max-width: 960px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+        sans-serif;
+      background: radial-gradient(circle at top left, #1f2937 0, #020617 55%);
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 32px 16px;
+    }
+
+    .page {
+      width: 100%;
+      max-width: var(--max-width);
+      background: linear-gradient(135deg, #020617 0%, #020617 40%, #111827 100%);
+      border-radius: 26px;
+      box-shadow: var(--shadow-soft);
+      border: 1px solid rgba(148, 163, 184, 0.35);
+      padding: 28px 24px 26px;
+    }
+
+    @media (min-width: 768px) {
+      .page {
+        padding: 32px 32px 28px;
+      }
+    }
+
+    header {
+      display: flex;
+      gap: 18px;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .logo-pill {
+      width: 84px;
+      height: 84px;
+      border-radius: 999px;
+      background: radial-gradient(circle at 30% 20%, #f97316, #ef4444);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 18px 40px rgba(248, 113, 113, 0.5);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .logo-butterfly {
+      width: 64px;
+      height: 64px;
+      position: relative;
+    }
+
+    .logo-butterfly::before,
+    .logo-butterfly::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: 45% 55% 55% 45% / 55% 45% 55% 45%;
+      background: #f9fafb;
+      transform-origin: center;
+    }
+
+    .logo-butterfly::before {
+      transform: translateX(-18%) rotate(-17deg);
+      opacity: 0.98;
+    }
+
+    .logo-butterfly::after {
+      transform: translateX(18%) rotate(17deg);
+      opacity: 0.98;
+    }
+
+    .title-block h1 {
+      margin: 0;
+      font-size: clamp(1.65rem, 2.1vw + 1.2rem, 2.1rem);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .title-block span {
+      display: inline-block;
+      font-size: 0.95rem;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    .badge-row {
+      margin-top: 8px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .badge {
+      font-size: 0.78rem;
+      border-radius: 999px;
+      padding: 4px 10px;
+      border: 1px solid rgba(148, 163, 184, 0.5);
+      color: #e5e7eb;
+      background: rgba(15, 23, 42, 0.7);
+    }
+
+    main {
+      display: grid;
+      grid-template-columns: minmax(0, 3fr) minmax(0, 2.2fr);
+      gap: 22px;
+      margin-top: 4px;
+    }
+
+    @media (max-width: 800px) {
+      main {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+
+    .card {
+      border-radius: var(--card-radius);
+      border: 1px solid var(--border-subtle);
+      background: radial-gradient(circle at top left, #020617 0, #020617 40%, #020617 100%);
+      padding: 18px 18px 16px;
+    }
+
+    .card + .card {
+      margin-top: 10px;
+    }
+
+    .card h2 {
+      margin: 0 0 12px;
+      font-size: 1rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: #9ca3af;
+    }
+
+    .card p {
+      margin: 0 0 10px;
+      font-size: 0.93rem;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+
+    .card ul {
+      margin: 0;
+      padding-left: 18px;
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      line-height: 1.5;
+    }
+
+    .card li + li {
+      margin-top: 4px;
+    }
+
+    .buttons-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 8px;
+      margin-bottom: 4px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 9px 18px;
+      border-radius: 999px;
+      border: 1px solid transparent;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      transition: transform 0.12s ease, box-shadow 0.12s ease, background 0.12s ease, border-color 0.12s ease, color 0.12s ease;
+      white-space: nowrap;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #f97316, #ef4444);
+      color: #0b1120;
+      box-shadow: 0 14px 30px rgba(248, 113, 113, 0.55);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 18px 40px rgba(248, 113, 113, 0.65);
+    }
+
+    .btn-secondary {
+      border-color: rgba(148, 163, 184, 0.7);
+      background: rgba(15, 23, 42, 0.9);
+      color: #e5e7eb;
+    }
+
+    .btn-secondary:hover {
+      border-color: rgba(249, 115, 22, 0.75);
+      background: rgba(15, 23, 42, 1);
+    }
+
+    .btn span.icon {
+      font-size: 1.05rem;
+      margin-right: 7px;
+    }
+
+    .highlight {
+      background: var(--accent-soft);
+      border-radius: 999px;
+      padding: 3px 8px;
+      color: #fed7aa;
+      font-size: 0.78rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .highlight::before {
+      content: "●";
+      font-size: 0.65rem;
+      color: #fb923c;
+    }
+
+    .panel-subtitle {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+    }
+
+    .pill-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 6px;
+    }
+
+    .pill {
+      font-size: 0.8rem;
+      padding: 4px 9px;
+      border-radius: 999px;
+      background: rgba(15, 23, 42, 0.85);
+      border: 1px solid rgba(148, 163, 184, 0.55);
+      color: #e5e7eb;
+    }
+
+    footer {
+      margin-top: 18px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    footer a {
+      color: #e5e7eb;
+      text-decoration: none;
+      border-bottom: 1px dashed rgba(148, 163, 184, 0.6);
+    }
+
+    footer a:hover {
+      border-bottom-style: solid;
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <header>
+      <div class="logo-pill" aria-hidden="true">
+        <div class="logo-butterfly"></div>
+      </div>
+      <div class="title-block">
+        <h1>Imago English</h1>
+        <span>Spaced-repetition language learning web app</span>
+        <div class="badge-row">
+          <span class="badge">Python · Flask · SQLAlchemy · Docker</span>
+          <span class="badge">Google OAuth · Calendar · Translate APIs · Google Cloud Storage </span>
+          <span class="badge">PWA-ready · Teacher/Admin/Student dashboards</span>
+        </div>
+      </div>
+    </header>
+
+    <main>
+      <!-- Left column: demo + how to explore -->
+      <section>
+        <div class="card">
+          <h2>Live Demo</h2>
+          <p>
+            This demo runs the current portfolio version of <strong>Imago English</strong> –
+            a modular Flask application that combines spaced-repetition flashcards,
+            an audiobook reader with inline translation, and teacher/admin tooling.
+          </p>
+
+          <div class="buttons-row">
+            <a class="btn btn-primary"
+               href="https://imago-english-demo.onrender.com"
+               target="_blank" rel="noopener noreferrer">
+              <span class="icon">▶️</span>
+              Open Live Demo
+            </a>
+
+            <a class="btn btn-secondary"
+               href="https://github.com/vmathm/imago-english-v2"
+               target="_blank" rel="noopener noreferrer">
+              <span class="icon">{"</>"}</span>
+              View Source Code
+            </a>
+          </div>
+
+          <p class="panel-subtitle">
+            <span class="highlight">How to explore quickly</span>
+          </p>
+          <ul>
+            <li>
+              On the landing page, use the <strong>demo login</strong> option to log in
+              as test users (student, teacher, and admin) – no Google account required.
+            </li>
+            <li>
+              As a student, add a few flashcards and start a 
+              <strong> study session</strong> to see the custom spaced-repetition logic.
+            </li>
+            <li>
+              Switch to a teacher user to view the <strong>dashboard with assigned
+              students</strong> and manage their flashcards.
+            </li>
+          </ul>
+        </div>
+
+        <div class="card">
+          <h2>What this demo shows</h2>
+          <ul>
+            <li><strong>Role-based access</strong>: students, teachers, admins with different dashboards.</li>
+            <li><strong>Flashcard engine</strong> using a customized SM-2 spaced-repetition algorithm with streaks and points.</li>
+            <li><strong>Audiobook reader</strong> with text selection → Google Translate → “Add as flashcard”.</li>
+            <li><strong>Leaderboard</strong> based on total points × study streak.</li>
+            <li><strong>Calendar</strong> view using Google Calendar free/busy + per-teacher settings.</li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- Right column: tech + quick facts -->
+      <aside>
+        <div class="card">
+          <h2>Tech Highlights</h2>
+          <p>
+            The app is written as a clean, portfolio-ready Flask project using the
+            app-factory pattern, blueprints, and a documented development process.
+          </p>
+          <ul>
+            <li>Flask blueprints for <em>auth</em>, <em>flashcards</em>, <em>audiobook</em>, <em>dashboard</em>, <em>admin</em>, <em>progress</em>, and <em>calendar</em>.</li>
+            <li>SQLAlchemy models for users, flashcards, and calendar settings.</li>
+            <li>Google OAuth via Flask-Dance + Flask-Login session management.</li>
+            <li>Separate docs for architecture, API endpoints, frontend, and spaced-repetition logic.</li>
+          </ul>
+          <div class="pill-list">
+            <span class="pill">Blueprint architecture</span>
+            <span class="pill">Spaced repetition</span>
+            <span class="pill">Google APIs</span>
+            <span class="pill">CSRF-protected forms</span>
+            <span class="pill">Dockerized dev setup</span>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2>Suggested Use in a Portfolio</h2>
+          <p>
+            This page is meant to be the main link from
+            <strong>LinkedIn → Featured</strong>, giving recruiters a single,
+            stable entry point to both the live app and the repository.
+          </p>
+          <p>
+            If the hosting provider ever changes, only the target of
+            <em>“Open Live Demo”</em> needs to be updated – the GitHub Pages URL
+            remains the same.
+          </p>
+        </div>
+      </aside>
+    </main>
+
+    <footer>
+      <span>Built by Vitor Mathias · Imago Education &amp; Technology</span>
+      <span><a href="https://github.com/vmathm" target="_blank" rel="noopener noreferrer">GitHub @vmathm</a></span>
+    </footer>
+  </div>
+</body>
+</html>
